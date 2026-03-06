@@ -1,67 +1,63 @@
 #include <iostream>
-#include <iomanip>
 #include <vector>
-using namespace std; 
+using namespace std;
 
-template <typename T>
-void swap(T *a, T *b){
-    T temp = *a;
-    *a = *b;
-    *b = temp;
+void sort(vector<double>&ratio,vector<int>&p, vector<int>&w){
+    int n = p.size();
+    for(int i=0;i<n;i++){
+        for(int j=i+1;j<n;j++){ // use j = i+1 to prevent switching back (happens when j starts from 0)
+            if(ratio[i]<ratio[j]){
+                swap(ratio[i],ratio[j]);
+                swap(p[i],p[j]);
+                swap(w[i],w[j]);
+            }
+        }
+    }
 }
 
 int main(){
-    int n, W; 
-    double currWeight = 0.0;
-    double currProfit = 0.0;
-    
+    int n;
     cin>>n;
-    
-    vector<int> weight;
-    vector<int> profit;
-    vector<double> ratio;
-    vector<double> frac(n,0);
-    
+    vector<int> profit(n,0);
+    vector<int> weight(n,0);
+    int capacity = 0;
+
     for(int i=0;i<n;i++){
-        int temp = 0;
-        cin>>temp; 
-        weight.push_back(temp);
+        int temp;
+        cin>>temp;
+        profit[i] = temp;
+        cin>>temp;
+        weight[i] = temp;
     }
+
+    cin>>capacity;
+
     
+    vector<double>ratio(n,0);
+    vector<double>hot_encode(n,0);
     for(int i=0;i<n;i++){
-        int temp = 0;
-        cin>>temp; 
-        profit.push_back(temp);
+        ratio[i] = (double)profit[i]/weight[i]; // Force a type conversion to prevent integer division and getting wrong answer.
     }
-    
-    cin>>W;
-    
+    sort(ratio,profit,weight);
+
+    int rem_cap = capacity;
+    int total_used = 0;
+
     for(int i=0;i<n;i++){
-        double temp = (double)profit[i]/weight[i];
-        ratio.push_back(temp);
-    }
-    
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++){
-            if(ratio[i]>ratio[j]){
-                swap(&ratio[i],&ratio[j]);
-                swap(&weight[i],&weight[j]);
-                swap(&profit[i], &profit[j]);
-            }
-        }
-    } // Bubble-sorting by highest P/W ratio
-    
-    for(int i=0;i<n; i++){
-        if(currWeight + weight[i] <= W){
-            currWeight += weight[i];
-            currProfit += profit[i];
-        }
-        else{
-            int remain = W - currWeight;
-            currProfit += profit[i]*((double)remain/weight[i]);
+        if(total_used + weight[i]>capacity){
+            hot_encode[i] = (double)rem_cap/weight[i]; // Force a type conversion to prevent integer division and getting wrong answer.
             break;
         }
+        else{
+            rem_cap -= weight[i];
+            total_used +=weight[i];
+            hot_encode[i] = 1;
+        }
     }
-    
-    cout<<currProfit;
+    double total_profit=0;
+    for(int i=0;i<n;i++){
+        total_profit+=hot_encode[i]*profit[i];
+    }
+
+    cout<<total_profit;
 }
