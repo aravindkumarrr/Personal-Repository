@@ -7,7 +7,7 @@ using namespace std;
 
 int n;
 int dist[10][10];
-int dp[1024][10];
+int dp[1024][10]; // 1024 = 2^10, where 10 = number of cities. Change that if # of cities change.
 
 int tsp(int mask, int pos) {
     if (mask == (1 << n) - 1) return dist[pos][0]; 
